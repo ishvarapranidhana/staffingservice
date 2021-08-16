@@ -6,3 +6,7 @@ pluginManagement {
 	}
 }
 rootProject.name = 'staffingservice'
+
+tasks.bootJar {
+    archiveFileName.set("staffingservice.jar")
+}
