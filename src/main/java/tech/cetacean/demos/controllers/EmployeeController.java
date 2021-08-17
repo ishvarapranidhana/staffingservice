@@ -28,7 +28,7 @@ public class EmployeeController {
 	@Autowired
 	private EmployeeRepository repository;
 	
-	@GetMapping("/employee/")
+	@GetMapping("/employee")
     public ResponseEntity<List<Employee>> read() {
         List<Employee> employees = repository.findAll();
 		return new ResponseEntity<List<Employee>>(employees, HttpStatus.OK);
@@ -62,7 +62,7 @@ public class EmployeeController {
     	
     }
 
-    @PostMapping("/employee/")
+    @PostMapping("/employee")
     public ResponseEntity<Employee> create(@RequestBody Employee employee) throws URISyntaxException {
         Employee createdEmployee =  repository.save(employee);      
 
