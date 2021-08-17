@@ -33,7 +33,7 @@ public class PositionController {
 		return new ResponseEntity<Position>(position, HttpStatus.OK);
 	}
 	
-	@GetMapping("/position/")
+	@GetMapping("/position")
 	public ResponseEntity<List<Position>> getPositions() {
 		List<Position> positions = positionRepository.findAll();
 		//ordering by salary
