@@ -71,6 +71,11 @@ public class Position {
 	public void setEmployees(List<Employee> employees) {
 		this.employees = employees;
 	}
+	public void update(Position position) {
+		this.name = position.getName();
+		this.employees.clear();
+		this.employees.addAll(position.getEmployees());
+	}
 	
 	
 	

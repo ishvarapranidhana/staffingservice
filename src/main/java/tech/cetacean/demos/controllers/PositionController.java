@@ -12,19 +12,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import tech.cetacean.demos.model.Position;
 import tech.cetacean.demos.repository.PositionRepository;
 
 @RestController
 public class PositionController {
 	@Autowired
-	private PositionRepository positionRepository;
+	private PositionRepository repository;
 	@GetMapping("/position/name/{name}")
 	public ResponseEntity<Position> getPositionByName(@PathVariable String name) {
-		Position position = positionRepository.findByName(name);
+		Position position = repository.findByName(name);
 		return new ResponseEntity<Position>(position, HttpStatus.OK);
 	}
 	@GetMapping("/position/id/{id}")
@@ -33,13 +35,13 @@ public class PositionController {
 		List<Integer> idsToLookup = new ArrayList<Integer>();
 		idsToLookup.add(Integer.valueOf(id));
 		
-		Position position = positionRepository.findAllById(idsToLookup).get(0);
+		Position position = repository.findAllById(idsToLookup).get(0);
 		return new ResponseEntity<Position>(position, HttpStatus.OK);
 	}
 	
 	@GetMapping("/position")
 	public ResponseEntity<List<Position>> getPositions() {
-		List<Position> positions = positionRepository.findAll();
+		List<Position> positions = repository.findAll();
 		//ordering by salary
 		for(Position position: positions) {
 			Collections.sort(position.getEmployees());
@@ -50,7 +52,7 @@ public class PositionController {
 	
 	@PostMapping("/position")
 	public ResponseEntity<Position> create(@RequestBody Position position) throws URISyntaxException {
-		Position createdPosition =  positionRepository.save(position);      
+		Position createdPosition =  repository.save(position);      
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
@@ -60,5 +62,29 @@ public class PositionController {
         return ResponseEntity.created(uri)
             .body(createdPosition);
 	}
+	
+	@PutMapping("/position")
+	public ResponseEntity<Position> update(@RequestBody Position position) {
+        
+        Integer id = position.getId();
+		
+		Boolean existsPosition= repository.existsById(id);
+        
+        if (!existsPosition) {
+            return ResponseEntity.notFound().build();
+        } else {
+        	
+        	List<Integer> idsToLookup = new ArrayList<Integer>();
+    		idsToLookup.add(Integer.valueOf(id));
+    		
+    		Position toUpdatePosition  = repository.findAllById(idsToLookup).get(0);
+        	        	
+        	toUpdatePosition.update(position);
+        	repository.save(toUpdatePosition);
+        	
+            return ResponseEntity.ok(toUpdatePosition);
+        }
+    }
+	
 	
 }
