@@ -14,14 +14,14 @@ import javax.persistence.InheritanceType;
 public class Person {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	private String name;
+	protected Integer id;
+	protected String name;
 	@Column(name = "last_name")
-	private String lastName;
-	private String address;
-	private String cellphone;
+	protected String lastName;
+	protected String address;
+	protected String cellphone;
 	@Column(name = "city_name")
-	private String cityName;
+	protected String cityName;
 	
 	public Person() {
 	}

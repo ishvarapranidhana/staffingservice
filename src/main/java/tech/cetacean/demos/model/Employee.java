@@ -1,6 +1,9 @@
 package tech.cetacean.demos.model;
 
+import java.util.Objects;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -12,8 +15,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 public class Employee extends Person implements Comparable<Employee>{
 	private Integer salary;
 	@JsonBackReference
-	@ManyToOne
-	@JoinColumn(name = "position_id")
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "position_id", nullable = false)
 	private Position position;
 
 	/**
@@ -58,18 +61,20 @@ public class Employee extends Person implements Comparable<Employee>{
 	}
 	
 	public Employee() {
-		
+		super();
 	}
 	
 	public void update(Employee updatedEmployee) {
 		
-		this.setPosition(updatedEmployee.getPosition());
-		this.setSalary(updatedEmployee.getSalary());
-		super.setAddress(getAddress());
-		super.setCellphone(updatedEmployee.getCellphone());
-		super.setCityName(updatedEmployee.getCityName());
-		super.setName(updatedEmployee.getName());
-		super.setLastName(updatedEmployee.getLastName());
+		if(updatedEmployee.getPosition()!=null) {
+			this.setPosition(updatedEmployee.position);
+		}
+		this.setSalary(updatedEmployee.salary);
+		super.setAddress(updatedEmployee.address);
+		super.setCellphone(updatedEmployee.cellphone);
+		super.setCityName(updatedEmployee.cityName);
+		super.setName(updatedEmployee.name);
+		super.setLastName(updatedEmployee.lastName);
 		
 	}
 
@@ -77,9 +82,19 @@ public class Employee extends Person implements Comparable<Employee>{
 	public int compareTo(Employee o) {
 		return Integer.compare(o.getSalary(), getSalary());
 	}
-
 	
+	@Override
+	public boolean equals(Object o) {
 
-	
+	    if (this == o)
+	      return true;
+	    if (!(o instanceof Employee))
+	      return false;
+	    Employee employee = (Employee) o;
+	    return Objects.equals(this.id, employee.id) && Objects.equals(this.name, employee.name)
+	        && Objects.equals(this.salary, employee.salary) && Objects.equals(this.lastName, employee.lastName)
+	        && Objects.equals(this.cityName, employee.cityName) && Objects.equals(this.cellphone, employee.cellphone)
+	        && Objects.equals(this.position, employee.position) && Objects.equals(this.address, employee.address);
+	  }
 
 }

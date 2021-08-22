@@ -5,6 +5,7 @@ package tech.cetacean.demos.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,7 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 
 @Entity
 public class Position {
@@ -26,7 +26,7 @@ public class Position {
 	@JsonManagedReference
 	@OneToMany(
 			mappedBy = "position",
-			cascade = CascadeType.ALL,
+			cascade = {CascadeType.MERGE, CascadeType.REFRESH},
 			orphanRemoval = true
 	)
 	private List<Employee> employees = new ArrayList<>();
@@ -76,10 +76,34 @@ public class Position {
 		this.employees.clear();
 		this.employees.addAll(position.getEmployees());
 	}
+	/**
+	 * @param id
+	 * @param name
+	 * @param employees
+	 */
+	public Position(Integer id, String name, List<Employee> employees) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.employees = employees;
+	}
 	
+	public boolean Equals(Object o) {
+		if (this == o)
+		      return true;
+		    if (!(o instanceof Position))
+		      return false;
+		    Position position = (Position) o;
+		    return Objects.equals(this.id , position.id) && Objects.equals(this.name, position.name);
+	}
 	
-	
-	
+	@Override
+	  public int hashCode() {
+	    return Objects.hash(this.id, this.name);
+	 }
+	public void updateMaintainingEmployees(Position position) {
+		this.name = position.getName();
+	}
 	
 
 }

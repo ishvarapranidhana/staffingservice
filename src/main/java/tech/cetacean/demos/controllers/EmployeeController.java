@@ -2,7 +2,6 @@ package tech.cetacean.demos.controllers;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import tech.cetacean.demos.model.Employee;
 import tech.cetacean.demos.repository.EmployeeRepository;
+import tech.cetacean.demos.service.EmployeeService;
 
 
 @RestController
@@ -27,6 +27,8 @@ public class EmployeeController {
 	
 	@Autowired
 	private EmployeeRepository repository;
+	@Autowired
+	private EmployeeService service;
 	
 	@GetMapping("/employee")
     public ResponseEntity<List<Employee>> read() {
@@ -64,42 +66,30 @@ public class EmployeeController {
 
     @PostMapping("/employee")
     public ResponseEntity<Employee> create(@RequestBody Employee employee) throws URISyntaxException {
-        Employee createdEmployee =  repository.save(employee);      
+        
+    	/*Employee createdEmployee =*/ service.create(employee);
+    	repository.save(employee); 
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(createdEmployee.getId())
+            .buildAndExpand(employee.getId())
             .toUri();
 
         return ResponseEntity.created(uri)
-            .body(createdEmployee);
+            .body(employee);
     }
 
     @PutMapping("/employee/{id}")
     public ResponseEntity<Employee> update(@RequestBody Employee employee, @PathVariable Integer id) {
         
-        Boolean existsEmployee= repository.existsById(id);
-        
-        if (!existsEmployee) {
-            return ResponseEntity.notFound().build();
+    	Optional<Employee> toUpdateEmployeeObj  = repository.findById(id);
+    	
+        if (toUpdateEmployeeObj.isEmpty()) {
+        	return ResponseEntity.notFound().build();
         } else {
-        	
-        	/** 
-        	 * this apparently retrieves an empty Bean:
-        	 * 
-        	 * Employee toUpdateEmployee  = repository.getById(id);
-        	 *  
-        	 */
-        	
-        	List<Integer> idsToLookup = new ArrayList<Integer>();
-    		idsToLookup.add(Integer.valueOf(id));
-    		
-    		Employee toUpdateEmployee  = repository.findAllById(idsToLookup).get(0);
-        	        	
+        	Employee toUpdateEmployee = toUpdateEmployeeObj.get();
         	toUpdateEmployee.update(employee);
-        	repository.save(toUpdateEmployee);
-        	
-            return ResponseEntity.ok(toUpdateEmployee);
+        	return ResponseEntity.ok(repository.save(toUpdateEmployee));
         }
     }
 

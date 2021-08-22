@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import tech.cetacean.demos.model.Position;
 import tech.cetacean.demos.repository.PositionRepository;
+import tech.cetacean.demos.service.PositionService;
 
 @RestController
 public class PositionController {
@@ -29,6 +31,9 @@ public class PositionController {
 		Position position = repository.findByName(name);
 		return new ResponseEntity<Position>(position, HttpStatus.OK);
 	}
+	@Autowired
+	PositionService service;
+	
 	@GetMapping("/position/id/{id}")
 	public ResponseEntity<Position> getPositionById(@PathVariable String id) {
 		
@@ -42,7 +47,9 @@ public class PositionController {
 	@GetMapping("/position")
 	public ResponseEntity<List<Position>> getPositions() {
 		List<Position> positions = repository.findAll();
+		
 		//ordering by salary
+		//Employee implements Comparable<Employee> 
 		for(Position position: positions) {
 			Collections.sort(position.getEmployees());
 		}
@@ -52,38 +59,40 @@ public class PositionController {
 	
 	@PostMapping("/position")
 	public ResponseEntity<Position> create(@RequestBody Position position) throws URISyntaxException {
-		Position createdPosition =  repository.save(position);      
+		
+		/*Position createdPosition = */ service.create(position);
+		repository.save(position);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(createdPosition.getId())
+            .buildAndExpand(position.getId())
             .toUri();
 
         return ResponseEntity.created(uri)
-            .body(createdPosition);
+            .body(position);
 	}
 	
-	@PutMapping("/position")
-	public ResponseEntity<Position> update(@RequestBody Position position) {
+	@PutMapping("/position/{id}")
+	public ResponseEntity<Position> update(@RequestBody Position position, @PathVariable Integer id) {
         
-        Integer id = position.getId();
-		
-		Boolean existsPosition= repository.existsById(id);
-        
-        if (!existsPosition) {
-            return ResponseEntity.notFound().build();
-        } else {
-        	
-        	List<Integer> idsToLookup = new ArrayList<Integer>();
-    		idsToLookup.add(Integer.valueOf(id));
+    	Optional<Position> foundPositionObj =  repository.findById(id);
+    	
+    	if (foundPositionObj.isEmpty()) {
+    		return ResponseEntity.notFound().build();
+    	}else{
     		
-    		Position toUpdatePosition  = repository.findAllById(idsToLookup).get(0);
-        	        	
-        	toUpdatePosition.update(position);
-        	repository.save(toUpdatePosition);
-        	
-            return ResponseEntity.ok(toUpdatePosition);
-        }
+    		Position toUpdatePosition = foundPositionObj.get();
+    		
+    		if(position.getEmployees().isEmpty()) {
+    			toUpdatePosition.updateMaintainingEmployees(position);
+    		}else {
+    			
+    			toUpdatePosition.update(position);
+    		}
+    		repository.save(toUpdatePosition);
+    		
+        	return ResponseEntity.ok(toUpdatePosition);
+    	}
     }
 	
 	
