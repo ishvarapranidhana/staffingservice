@@ -67,7 +67,7 @@ public class EmployeeController {
     @PostMapping("/employee")
     public ResponseEntity<Employee> create(@RequestBody Employee employee) throws URISyntaxException {
         
-    	/*Employee createdEmployee =*/ service.create(employee);
+    	service.create(employee);
     	repository.save(employee); 
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
