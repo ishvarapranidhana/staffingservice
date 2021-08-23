@@ -62,14 +62,6 @@ public class PositionController {
 	@PostMapping("/position")
 	public ResponseEntity<Position> create(@RequestBody Position position) throws URISyntaxException {
 		
-		Position existentPosition = repository.findByName(position.getName());
-		
-		if(existentPosition!=null) {
-		
-			throw new ConflictingNameException("position name : " + position.getName()  + " already existent");
-		}
-		
-		
 		service.create(position);
 		repository.save(position);
 
