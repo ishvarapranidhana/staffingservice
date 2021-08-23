@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import tech.cetacean.demos.exceptions.ConflictingNameException;
 import tech.cetacean.demos.model.Position;
 import tech.cetacean.demos.repository.PositionRepository;
 import tech.cetacean.demos.service.PositionService;
@@ -61,7 +62,15 @@ public class PositionController {
 	@PostMapping("/position")
 	public ResponseEntity<Position> create(@RequestBody Position position) throws URISyntaxException {
 		
-		/*Position createdPosition = */ service.create(position);
+		Position existentPosition = repository.findByName(position.getName());
+		
+		if(existentPosition!=null) {
+		
+			throw new ConflictingNameException("position name : " + position.getName()  + " already existent");
+		}
+		
+		
+		service.create(position);
 		repository.save(position);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()

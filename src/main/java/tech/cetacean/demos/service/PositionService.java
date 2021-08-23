@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tech.cetacean.demos.exceptions.ConflictingNameException;
 import tech.cetacean.demos.model.Employee;
 import tech.cetacean.demos.model.Position;
 import tech.cetacean.demos.repository.EmployeeRepository;
@@ -21,6 +22,14 @@ public class PositionService {
 	PositionRepository positionRepository;
 
 	public void create(Position position) {
+		
+		String positionName = position.getName();
+		Position existentPosition = positionRepository.findByName(positionName);
+		
+		if(existentPosition!=null) {
+		
+			throw new ConflictingNameException("position name : " + position.getName()  + " already existent");
+		}
 		
 		List<Employee> employeesToSave = new ArrayList<Employee>();
 		
