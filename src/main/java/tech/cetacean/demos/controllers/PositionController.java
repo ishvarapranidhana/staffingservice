@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import tech.cetacean.demos.exceptions.ConflictingNameException;
+import tech.cetacean.demos.model.Employee;
 import tech.cetacean.demos.model.Position;
 import tech.cetacean.demos.repository.PositionRepository;
 import tech.cetacean.demos.service.PositionService;
@@ -37,13 +38,16 @@ public class PositionController {
 	PositionService service;
 	
 	@GetMapping("/position/id/{id}")
-	public ResponseEntity<Position> getPositionById(@PathVariable String id) {
+	public ResponseEntity<Position> getPositionById(@PathVariable Integer id) {
 		
-		List<Integer> idsToLookup = new ArrayList<Integer>();
-		idsToLookup.add(Integer.valueOf(id));
+		Optional<Position> foundPosition = repository.findById(id);
 		
-		Position position = repository.findAllById(idsToLookup).get(0);
-		return new ResponseEntity<Position>(position, HttpStatus.OK);
+		if (foundPosition.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(foundPosition.get());
+        }
+		
 	}
 	
 	@GetMapping("/position")
