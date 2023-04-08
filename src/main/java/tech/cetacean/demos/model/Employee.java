@@ -88,10 +88,9 @@ public class Employee extends Person implements Comparable<Employee>{
 
 	    if (this == o)
 	      return true;
-	    if (!(o instanceof Employee))
+	    if (!(o instanceof Employee employee))
 	      return false;
-	    Employee employee = (Employee) o;
-	    return Objects.equals(this.id, employee.id) && Objects.equals(this.name, employee.name)
+		return Objects.equals(this.id, employee.id) && Objects.equals(this.name, employee.name)
 	        && Objects.equals(this.salary, employee.salary) && Objects.equals(this.lastName, employee.lastName)
 	        && Objects.equals(this.cityName, employee.cityName) && Objects.equals(this.cellphone, employee.cellphone)
 	        && Objects.equals(this.position, employee.position) && Objects.equals(this.address, employee.address);

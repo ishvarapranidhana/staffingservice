@@ -91,10 +91,9 @@ public class Position {
 	public boolean Equals(Object o) {
 		if (this == o)
 		      return true;
-		    if (!(o instanceof Position))
+		    if (!(o instanceof Position position))
 		      return false;
-		    Position position = (Position) o;
-		    return Objects.equals(this.id , position.id) && Objects.equals(this.name, position.name);
+		return Objects.equals(this.id , position.id) && Objects.equals(this.name, position.name);
 	}
 	
 	@Override
